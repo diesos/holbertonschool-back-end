@@ -37,3 +37,17 @@ def display_employee_info(user_data, completed_tasks, total_tasks):
 
 	for task in completed_tasks:
 		print(f"\t {task['title']}")
+
+	if __name__ == '__main__':
+	if len(sys.argv) != 2:
+		print("Usage: python script.py <user_id>")
+		sys.exit(1)
+
+	user_id = sys.argv[1]
+
+	user_info = get_user_info(user_id)
+	todo_list = get_todo_list(user_id)
+	completed_tasks = get_completed_tasks(todo_list)
+	total_tasks = len(todo_list)
+
+	display_employee_info(user_info, completed_tasks, total_tasks)
