@@ -1,53 +1,30 @@
-#!/usr/bin/python3
-"""Script that display infos for a given employee"""
+""" Script that returns 'to-do list' info for a given employee ID """
 
 import requests
 import sys
 
+API_URL = "https://jsonplaceholder.typicode.com/"
 
-API_URL = "https://jsonplaceholder.typicode.com"
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: ./0-gather_data_from_an_API.py <employee id>")
+        sys.exit(1)
 
+    id = sys.argv[1]
 
-def get_user_info(user_id):
-	user_request = requests.get(f"{API_URL}/users/{user_id}")
-	user_data = user_request.json()
-	return user_data
+    employee = requests.get(API_URL + "users/{}".format(id)).json()
 
+    todo_list = requests.get("{}todos?userId={}".format(API_URL, id)).json()
 
-def get_todo_list(user_id):
-	todo_list = requests.get(f"{API_URL}/todo?userID={user_id}")
-	todo_list_data = todo_list.json()
-	return todo_list_data
+    completed_tasks = [
+        task.get("title") for task in todo_list if task.get("completed") is True
+    ]
 
+    print(
+        "Employee {} is done with tasks({}/{}):".format(
+            employee.get("name"), len(completed_tasks), len(todo_list)
+        )
+    )
 
-def task_done(todo_list_data):
-	completed_task = [task for task in todo_list_data if task["complete"]]
-	return completed_task
-
-
-def display_employee_info(user_data, completed_tasks, total_tasks):
-	user_name = user_data["name"]
-	len_completed_task = len(completed_tasks)
-
-	print("Employee {} is done with tasks({}/{}):".format(
-
-		user_name
-		len_completed_task
-		total_tasks))
-
-	for task in completed_tasks:
-		print(f"\t {task['title']}")
-
-	if __name__ == '__main__':
-	if len(sys.argv) != 2:
-		print("Usage: python script.py <user_id>")
-		sys.exit(1)
-
-	user_id = sys.argv[1]
-
-	user_info = get_user_info(user_id)
-	todo_list = get_todo_list(user_id)
-	completed_tasks = get_completed_tasks(todo_list)
-	total_tasks = len(todo_list)
-
-	display_employee_info(user_info, completed_tasks, total_tasks)
+    for task in completed_tasks:
+        print("\t {}".format(task))
